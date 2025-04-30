@@ -70,8 +70,6 @@ namespace SmartGreenhouse
             return dbSet.Find(id);
         }
 
-    
-
         public void Save()
         {
             context.SaveChanges();

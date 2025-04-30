@@ -1,4 +1,6 @@
 
+using Microsoft.EntityFrameworkCore;
+
 namespace SmartGreenhouse
 {
     public class Program
@@ -8,6 +10,8 @@ namespace SmartGreenhouse
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            string connString = builder.Configuration.GetConnectionString("LocalDb")!;
+            builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connString));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
