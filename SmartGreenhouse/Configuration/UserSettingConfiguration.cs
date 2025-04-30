@@ -15,7 +15,7 @@ namespace SmartGreenhouse.Configuration
             builder.HasOne(us => us.User)
                    .WithMany(u => u.UserSettings)
                    .HasForeignKey(us => us.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(us => us.Greenhouse)
                    .WithMany(g => g.UserSettings)

@@ -17,8 +17,7 @@ namespace SmartGreenhouse.Configuration
 
             builder.HasOne(s => s.Greenhouse)
                    .WithMany(g => g.SensorReadings)
-                   .HasForeignKey(s => s.GreenhouseId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(s => s.GreenhouseId);
         }
     }
 

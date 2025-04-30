@@ -24,23 +24,19 @@ namespace SmartGreenhouse.Configuration
 
             builder.HasOne(g => g.User)
                    .WithMany(u => u.Greenhouses)
-                   .HasForeignKey(g => g.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(g => g.UserId);
 
             builder.HasMany(g => g.SensorReadings)
                    .WithOne(s => s.Greenhouse)
-                   .HasForeignKey(s => s.GreenhouseId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(s => s.GreenhouseId);
 
             builder.HasMany(g => g.DeviceStates)
                    .WithOne(d => d.Greenhouse)
-                   .HasForeignKey(d => d.GreenhouseId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(d => d.GreenhouseId);
 
             builder.HasMany(g => g.UserSettings)
                    .WithOne(us => us.Greenhouse)
-                   .HasForeignKey(us => us.GreenhouseId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .HasForeignKey(us => us.GreenhouseId);
         }
     }
 }

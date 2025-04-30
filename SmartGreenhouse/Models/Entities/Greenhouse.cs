@@ -11,7 +11,7 @@
         public string Location { get; set; }
 
         public int UserId { get; set; }
-        public User User { get; set; }
+        public AppUser User { get; set; }
         public ICollection<SensorReading> SensorReadings { get; set; }
         public ICollection<DeviceState> DeviceStates { get; set; }
         public ICollection<UserSetting> UserSettings { get; set; }

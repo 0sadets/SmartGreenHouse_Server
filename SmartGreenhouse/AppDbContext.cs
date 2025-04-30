@@ -1,15 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SmartGreenhouse.Models.Entities;
 
 namespace SmartGreenhouse
 {
-    public class AppDbContext: DbContext
+    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<int>, int>
     {
         public AppDbContext() : base() { }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Greenhouse> Greenhouses { get; set; }
         public DbSet<SensorReading> SensorReadings { get; set; }
         public DbSet<DeviceState> DeviceStates { get; set; }

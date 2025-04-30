@@ -11,7 +11,7 @@
         public float TargetSoilMoisture { get; set; }
         public float TargetLight { get; set; }
 
-        public User User { get; set; }
+        public AppUser User { get; set; }
         public Greenhouse Greenhouse { get; set; }
     }
 }
