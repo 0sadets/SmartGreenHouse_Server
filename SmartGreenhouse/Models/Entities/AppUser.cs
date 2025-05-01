@@ -6,5 +6,7 @@ namespace SmartGreenhouse.Models.Entities
     {
         public ICollection<Greenhouse> Greenhouses { get; set; }
         public ICollection<UserSetting> UserSettings { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
+
     }
 }

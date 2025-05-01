@@ -16,5 +16,7 @@
 
         public float OptimalLightMin { get; set; }
         public float OptimalLightMax { get; set; }
+        public ICollection<GreenhousePlant> GreenhousePlants { get; set; }
+
     }
 }

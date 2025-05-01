@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartGreenhouse;
 
@@ -11,9 +12,11 @@ using SmartGreenhouse;
 namespace SmartGreenhouse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250501104839_GreenHousePlantTable")]
+    partial class GreenHousePlantTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,34 +352,6 @@ namespace SmartGreenhouse.Migrations
                     b.ToTable("Plants", (string)null);
                 });
 
-            modelBuilder.Entity("SmartGreenhouse.Models.Entities.RefreshToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AppUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("RefreshTokens");
-                });
-
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.SensorReading", b =>
                 {
                     b.Property<int>("Id")
@@ -540,17 +515,6 @@ namespace SmartGreenhouse.Migrations
                     b.Navigation("Plant");
                 });
 
-            modelBuilder.Entity("SmartGreenhouse.Models.Entities.RefreshToken", b =>
-                {
-                    b.HasOne("SmartGreenhouse.Models.Entities.AppUser", "AppUser")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.SensorReading", b =>
                 {
                     b.HasOne("SmartGreenhouse.Models.Entities.Greenhouse", "Greenhouse")
@@ -584,8 +548,6 @@ namespace SmartGreenhouse.Migrations
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.AppUser", b =>
                 {
                     b.Navigation("Greenhouses");
-
-                    b.Navigation("RefreshTokens");
 
                     b.Navigation("UserSettings");
                 });

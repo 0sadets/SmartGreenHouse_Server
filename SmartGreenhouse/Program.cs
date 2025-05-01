@@ -1,7 +1,10 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.Entities;
+using SmartGreenhouse.Repositories;
+using SmartGreenhouse.Services;
 
 namespace SmartGreenhouse
 {
@@ -19,6 +22,10 @@ namespace SmartGreenhouse
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -35,7 +42,9 @@ namespace SmartGreenhouse
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
 
             app.MapControllers();

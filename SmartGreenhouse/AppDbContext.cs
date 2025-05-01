@@ -16,6 +16,9 @@ namespace SmartGreenhouse
         public DbSet<DeviceState> DeviceStates { get; set; }
         public DbSet<UserSetting> UserSettings { get; set; }
         public DbSet<Plant> Plants { get; set; }
+        public DbSet<GreenhousePlant> GreenhousePlants {  get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

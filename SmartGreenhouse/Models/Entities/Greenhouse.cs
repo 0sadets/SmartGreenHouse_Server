@@ -15,6 +15,8 @@
         public ICollection<SensorReading> SensorReadings { get; set; }
         public ICollection<DeviceState> DeviceStates { get; set; }
         public ICollection<UserSetting> UserSettings { get; set; }
+        public ICollection<GreenhousePlant> GreenhousePlants { get; set; }
+
 
     }
 }

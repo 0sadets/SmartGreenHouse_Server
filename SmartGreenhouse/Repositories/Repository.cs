@@ -2,7 +2,7 @@
 using SmartGreenhouse.Interfaces;
 using System.Linq.Expressions;
 
-namespace SmartGreenhouse
+namespace SmartGreenhouse.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
@@ -11,7 +11,7 @@ namespace SmartGreenhouse
         public Repository(AppDbContext context)
         {
             this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            dbSet = context.Set<TEntity>();
         }
 
         public void Create(TEntity entity)
