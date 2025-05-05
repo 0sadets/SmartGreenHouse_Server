@@ -9,6 +9,9 @@
         public float Height { get; set; }
         public string Season { get; set; }
         public string Location { get; set; }
+
+        public List<PlantReadDto> Plants { get; set; }
     }
+
 
 }

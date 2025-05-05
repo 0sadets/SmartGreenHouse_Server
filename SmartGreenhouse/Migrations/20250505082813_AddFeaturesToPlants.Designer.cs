@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartGreenhouse;
 
@@ -11,9 +12,11 @@ using SmartGreenhouse;
 namespace SmartGreenhouse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505082813_AddFeaturesToPlants")]
+    partial class AddFeaturesToPlants
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace SmartGreenhouse.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GreenhousePlant", b =>
-                {
-                    b.Property<int>("GreenhousesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlantsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GreenhousesId", "PlantsId");
-
-                    b.HasIndex("PlantsId");
-
-                    b.ToTable("GreenhousePlant");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -307,6 +295,21 @@ namespace SmartGreenhouse.Migrations
                     b.ToTable("Greenhouses", (string)null);
                 });
 
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.GreenhousePlant", b =>
+                {
+                    b.Property<int>("GreenhouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GreenhouseId", "PlantId");
+
+                    b.HasIndex("PlantId");
+
+                    b.ToTable("GreenhousePlants");
+                });
+
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.Plant", b =>
                 {
                     b.Property<int>("Id")
@@ -341,9 +344,6 @@ namespace SmartGreenhouse.Migrations
                     b.Property<float>("OptimalAirTempMin")
                         .HasColumnType("real");
 
-                    b.Property<float>("OptimalLightHourPerDay")
-                        .HasColumnType("real");
-
                     b.Property<float>("OptimalLightMax")
                         .HasColumnType("real");
 
@@ -356,143 +356,9 @@ namespace SmartGreenhouse.Migrations
                     b.Property<float>("OptimalSoilHumidityMin")
                         .HasColumnType("real");
 
-                    b.Property<float>("OptimalSoilTempMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("OptimalSoilTempMin")
-                        .HasColumnType("real");
-
                     b.HasKey("Id");
 
                     b.ToTable("Plants", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "Овочі",
-                            ExampleNames = "Помідори, Огірки, Перець, Баклажани",
-                            Features = "Огірки потребують більшої вологості, баклажани — стабільного тепла, перець — чутливий до перепадів температур.",
-                            OptimalAirHumidityMax = 80f,
-                            OptimalAirHumidityMin = 60f,
-                            OptimalAirTempMax = 26f,
-                            OptimalAirTempMin = 18f,
-                            OptimalLightHourPerDay = 10f,
-                            OptimalLightMax = 30000f,
-                            OptimalLightMin = 18000f,
-                            OptimalSoilHumidityMax = 75f,
-                            OptimalSoilHumidityMin = 65f,
-                            OptimalSoilTempMax = 24f,
-                            OptimalSoilTempMin = 18f
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "Зелень",
-                            ExampleNames = "Салат, Шпинат, Кріп, Петрушка, Базилік",
-                            Features = "Базилік полюбляє тепліші умови, ніж інша зелень.",
-                            OptimalAirHumidityMax = 90f,
-                            OptimalAirHumidityMin = 70f,
-                            OptimalAirTempMax = 22f,
-                            OptimalAirTempMin = 15f,
-                            OptimalLightHourPerDay = 8f,
-                            OptimalLightMax = 20000f,
-                            OptimalLightMin = 10000f,
-                            OptimalSoilHumidityMax = 70f,
-                            OptimalSoilHumidityMin = 60f,
-                            OptimalSoilTempMax = 20f,
-                            OptimalSoilTempMin = 16f
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Category = "Коренеплоди",
-                            ExampleNames = "Морква, Буряк, Редис, Картопля",
-                            Features = "Редис швидко росте в прохолодних умовах, картопля потребує глибокого ґрунту.",
-                            OptimalAirHumidityMax = 75f,
-                            OptimalAirHumidityMin = 60f,
-                            OptimalAirTempMax = 20f,
-                            OptimalAirTempMin = 12f,
-                            OptimalLightHourPerDay = 9f,
-                            OptimalLightMax = 25000f,
-                            OptimalLightMin = 15000f,
-                            OptimalSoilHumidityMax = 80f,
-                            OptimalSoilHumidityMin = 65f,
-                            OptimalSoilTempMax = 18f,
-                            OptimalSoilTempMin = 10f
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Category = "Ягоди",
-                            ExampleNames = "Полуниця, Малина, Лохина, Смородина",
-                            Features = "Лохина потребує кислий ґрунт; малина не переносить застійної води.",
-                            OptimalAirHumidityMax = 85f,
-                            OptimalAirHumidityMin = 60f,
-                            OptimalAirTempMax = 24f,
-                            OptimalAirTempMin = 16f,
-                            OptimalLightHourPerDay = 8f,
-                            OptimalLightMax = 30000f,
-                            OptimalLightMin = 20000f,
-                            OptimalSoilHumidityMax = 80f,
-                            OptimalSoilHumidityMin = 70f,
-                            OptimalSoilTempMax = 20f,
-                            OptimalSoilTempMin = 15f
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Category = "Фрукти",
-                            ExampleNames = "Лимон, Апельсин, Гранат, Інжир",
-                            Features = "Цитрусові не переносять переохолодження; інжир потребує періоду спокою взимку.",
-                            OptimalAirHumidityMax = 70f,
-                            OptimalAirHumidityMin = 50f,
-                            OptimalAirTempMax = 28f,
-                            OptimalAirTempMin = 20f,
-                            OptimalLightHourPerDay = 10f,
-                            OptimalLightMax = 35000f,
-                            OptimalLightMin = 25000f,
-                            OptimalSoilHumidityMax = 75f,
-                            OptimalSoilHumidityMin = 60f,
-                            OptimalSoilTempMax = 22f,
-                            OptimalSoilTempMin = 18f
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Category = "Тепличні квіти",
-                            ExampleNames = "Троянди, Орхідеї, Тюльпани",
-                            Features = "Орхідеї потребують розсіяного світла; тюльпани люблять прохолодні ночі.",
-                            OptimalAirHumidityMax = 80f,
-                            OptimalAirHumidityMin = 60f,
-                            OptimalAirTempMax = 25f,
-                            OptimalAirTempMin = 18f,
-                            OptimalLightHourPerDay = 8f,
-                            OptimalLightMax = 25000f,
-                            OptimalLightMin = 12000f,
-                            OptimalSoilHumidityMax = 70f,
-                            OptimalSoilHumidityMin = 55f,
-                            OptimalSoilTempMax = 22f,
-                            OptimalSoilTempMin = 16f
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Category = "Гриби",
-                            ExampleNames = "Печериці, Гливи, Трюфелі",
-                            Features = "Гриби не потребують багато світла; трюфелі ростуть у симбіозі з деревами.",
-                            OptimalAirHumidityMax = 95f,
-                            OptimalAirHumidityMin = 80f,
-                            OptimalAirTempMax = 20f,
-                            OptimalAirTempMin = 14f,
-                            OptimalLightHourPerDay = 2f,
-                            OptimalLightMax = 5000f,
-                            OptimalLightMin = 1000f,
-                            OptimalSoilHumidityMax = 90f,
-                            OptimalSoilHumidityMin = 75f,
-                            OptimalSoilTempMax = 18f,
-                            OptimalSoilTempMin = 14f
-                        });
                 });
 
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.RefreshToken", b =>
@@ -567,40 +433,19 @@ namespace SmartGreenhouse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("AirHumidityMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirHumidityMin")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirTempMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirTempMin")
-                        .HasColumnType("real");
-
                     b.Property<int>("GreenhouseId")
                         .HasColumnType("int");
 
-                    b.Property<float>("LightHoursPerDay")
+                    b.Property<float>("TargetAirHumidity")
                         .HasColumnType("real");
 
-                    b.Property<float>("LightMax")
+                    b.Property<float>("TargetAirTemp")
                         .HasColumnType("real");
 
-                    b.Property<float>("LightMin")
+                    b.Property<float>("TargetLight")
                         .HasColumnType("real");
 
-                    b.Property<float>("SoilHumidityMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilHumidityMin")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilTempMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilTempMin")
+                    b.Property<float>("TargetSoilMoisture")
                         .HasColumnType("real");
 
                     b.Property<int>("UserId")
@@ -613,21 +458,6 @@ namespace SmartGreenhouse.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSettings", (string)null);
-                });
-
-            modelBuilder.Entity("GreenhousePlant", b =>
-                {
-                    b.HasOne("SmartGreenhouse.Models.Entities.Greenhouse", null)
-                        .WithMany()
-                        .HasForeignKey("GreenhousesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartGreenhouse.Models.Entities.Plant", null)
-                        .WithMany()
-                        .HasForeignKey("PlantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -703,6 +533,25 @@ namespace SmartGreenhouse.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.GreenhousePlant", b =>
+                {
+                    b.HasOne("SmartGreenhouse.Models.Entities.Greenhouse", "Greenhouse")
+                        .WithMany("GreenhousePlants")
+                        .HasForeignKey("GreenhouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartGreenhouse.Models.Entities.Plant", "Plant")
+                        .WithMany("GreenhousePlants")
+                        .HasForeignKey("PlantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Greenhouse");
+
+                    b.Navigation("Plant");
+                });
+
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.RefreshToken", b =>
                 {
                     b.HasOne("SmartGreenhouse.Models.Entities.AppUser", "AppUser")
@@ -757,9 +606,16 @@ namespace SmartGreenhouse.Migrations
                 {
                     b.Navigation("DeviceStates");
 
+                    b.Navigation("GreenhousePlants");
+
                     b.Navigation("SensorReadings");
 
                     b.Navigation("UserSettings");
+                });
+
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.Plant", b =>
+                {
+                    b.Navigation("GreenhousePlants");
                 });
 #pragma warning restore 612, 618
         }

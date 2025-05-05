@@ -1,4 +1,6 @@
-﻿namespace SmartGreenhouse.Models.Entities
+﻿using System.Text.Json.Serialization;
+
+namespace SmartGreenhouse.Models.Entities
 {
     public class Greenhouse
     {
@@ -14,8 +16,9 @@
         public AppUser User { get; set; }
         public ICollection<SensorReading> SensorReadings { get; set; }
         public ICollection<DeviceState> DeviceStates { get; set; }
+        [JsonIgnore]
         public ICollection<UserSetting> UserSettings { get; set; }
-        public ICollection<GreenhousePlant> GreenhousePlants { get; set; }
+        public ICollection<Plant> Plants { get; set; }
 
 
     }

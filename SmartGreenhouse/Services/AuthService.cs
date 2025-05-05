@@ -62,10 +62,8 @@ namespace SmartGreenhouse.Services
             if (existingToken == null || existingToken.IsRevoked || existingToken.ExpiresAt <= DateTime.UtcNow)
                 throw new SecurityTokenException("Invalid or expired refresh token");
 
-            // Скасовуємо старий токен
             await _userRepository.RevokeRefreshTokenAsync(existingToken);
 
-            // Генеруємо нові токени
             var newAccessToken = await GenerateAccessToken(existingToken.AppUser);
             var newRefreshToken = await GenerateAndStoreRefreshToken(existingToken.AppUser);
 

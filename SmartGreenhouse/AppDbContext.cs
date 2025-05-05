@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartGreenhouse.Models.Entities;
+using SmartGreenhouse.Models;
 
 namespace SmartGreenhouse
 {
@@ -16,7 +17,6 @@ namespace SmartGreenhouse
         public DbSet<DeviceState> DeviceStates { get; set; }
         public DbSet<UserSetting> UserSettings { get; set; }
         public DbSet<Plant> Plants { get; set; }
-        public DbSet<GreenhousePlant> GreenhousePlants {  get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
@@ -26,6 +26,8 @@ namespace SmartGreenhouse
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            modelBuilder.SeedPlants();
         }
     }
 }

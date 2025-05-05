@@ -12,6 +12,18 @@ namespace SmartGreenhouse.Mapping
             CreateMap<GreenhouseUpdateDto, Greenhouse>();
             CreateMap<Greenhouse, GreenhouseReadDto>();
 
+            CreateMap<Plant, PlantReadDto>();
+
+            CreateMap<GreenhouseCreateDto, Greenhouse>()
+                .ForMember(dest => dest.Plants, opt => opt.Ignore());
+
+            CreateMap<Greenhouse, GreenhouseReadDto>()
+                .ForMember(dest => dest.Plants, opt => opt.MapFrom(src => src.Plants));
+
+            CreateMap<UserSetting, CreateUserSettingsDto>();
+
+
+
 
         }
     }

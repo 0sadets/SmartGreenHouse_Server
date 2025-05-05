@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using SmartGreenhouse.Models.Entities;
+using System.Reflection.Emit;
 
 namespace SmartGreenhouse.Configuration
 {
@@ -15,6 +16,9 @@ namespace SmartGreenhouse.Configuration
             builder.Property(p => p.Category)
                    .IsRequired()
                    .HasMaxLength(100);
+            builder.Property(p=>p.ExampleNames)
+                    .HasMaxLength(500);
+      
         }
     }
 

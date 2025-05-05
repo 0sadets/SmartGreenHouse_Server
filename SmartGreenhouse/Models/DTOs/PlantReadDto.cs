@@ -1,6 +1,6 @@
-﻿namespace SmartGreenhouse.Models.Entities
+﻿namespace SmartGreenhouse.Models.DTOs
 {
-    public class Plant
+    public class PlantReadDto
     {
         public int Id { get; set; }
         public string Category { get; set; }
@@ -24,7 +24,7 @@
 
         public string ExampleNames { get; set; }
         public string Features { get; set; }
-        public ICollection<Greenhouse> Greenhouses { get; set; }
-
     }
+
+
 }

@@ -1,4 +1,5 @@
-﻿using SmartGreenhouse.Models.Entities;
+﻿using SmartGreenhouse.Models.DTOs;
+using SmartGreenhouse.Models.Entities;
 
 namespace SmartGreenhouse.Interfaces
 {
@@ -10,5 +11,8 @@ namespace SmartGreenhouse.Interfaces
         void Update(Greenhouse entity);
         void Delete(int id);
         void Save();
+
+        Task<Greenhouse> CreateWithOptimalSettingsAsync(GreenhouseCreateDto dto, int userId);
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartGreenhouse;
 
@@ -11,9 +12,11 @@ using SmartGreenhouse;
 namespace SmartGreenhouse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250505094315_SeedPlants")]
+    partial class SeedPlants
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace SmartGreenhouse.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GreenhousePlant", b =>
-                {
-                    b.Property<int>("GreenhousesId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlantsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GreenhousesId", "PlantsId");
-
-                    b.HasIndex("PlantsId");
-
-                    b.ToTable("GreenhousePlant");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -307,6 +295,21 @@ namespace SmartGreenhouse.Migrations
                     b.ToTable("Greenhouses", (string)null);
                 });
 
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.GreenhousePlant", b =>
+                {
+                    b.Property<int>("GreenhouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GreenhouseId", "PlantId");
+
+                    b.HasIndex("PlantId");
+
+                    b.ToTable("GreenhousePlants");
+                });
+
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.Plant", b =>
                 {
                     b.Property<int>("Id")
@@ -567,40 +570,19 @@ namespace SmartGreenhouse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("AirHumidityMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirHumidityMin")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirTempMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("AirTempMin")
-                        .HasColumnType("real");
-
                     b.Property<int>("GreenhouseId")
                         .HasColumnType("int");
 
-                    b.Property<float>("LightHoursPerDay")
+                    b.Property<float>("TargetAirHumidity")
                         .HasColumnType("real");
 
-                    b.Property<float>("LightMax")
+                    b.Property<float>("TargetAirTemp")
                         .HasColumnType("real");
 
-                    b.Property<float>("LightMin")
+                    b.Property<float>("TargetLight")
                         .HasColumnType("real");
 
-                    b.Property<float>("SoilHumidityMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilHumidityMin")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilTempMax")
-                        .HasColumnType("real");
-
-                    b.Property<float>("SoilTempMin")
+                    b.Property<float>("TargetSoilMoisture")
                         .HasColumnType("real");
 
                     b.Property<int>("UserId")
@@ -613,21 +595,6 @@ namespace SmartGreenhouse.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSettings", (string)null);
-                });
-
-            modelBuilder.Entity("GreenhousePlant", b =>
-                {
-                    b.HasOne("SmartGreenhouse.Models.Entities.Greenhouse", null)
-                        .WithMany()
-                        .HasForeignKey("GreenhousesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartGreenhouse.Models.Entities.Plant", null)
-                        .WithMany()
-                        .HasForeignKey("PlantsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -703,6 +670,25 @@ namespace SmartGreenhouse.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.GreenhousePlant", b =>
+                {
+                    b.HasOne("SmartGreenhouse.Models.Entities.Greenhouse", "Greenhouse")
+                        .WithMany("GreenhousePlants")
+                        .HasForeignKey("GreenhouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartGreenhouse.Models.Entities.Plant", "Plant")
+                        .WithMany("GreenhousePlants")
+                        .HasForeignKey("PlantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Greenhouse");
+
+                    b.Navigation("Plant");
+                });
+
             modelBuilder.Entity("SmartGreenhouse.Models.Entities.RefreshToken", b =>
                 {
                     b.HasOne("SmartGreenhouse.Models.Entities.AppUser", "AppUser")
@@ -757,9 +743,16 @@ namespace SmartGreenhouse.Migrations
                 {
                     b.Navigation("DeviceStates");
 
+                    b.Navigation("GreenhousePlants");
+
                     b.Navigation("SensorReadings");
 
                     b.Navigation("UserSettings");
+                });
+
+            modelBuilder.Entity("SmartGreenhouse.Models.Entities.Plant", b =>
+                {
+                    b.Navigation("GreenhousePlants");
                 });
 #pragma warning restore 612, 618
         }

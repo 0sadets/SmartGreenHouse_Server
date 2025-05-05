@@ -8,7 +8,9 @@
         public float Height { get; set; }
         public string Season { get; set; }
         public string Location { get; set; }
-        public int UserId { get; set; }
+
+        public List<int> PlantIds { get; set; }
     }
+
 
 }

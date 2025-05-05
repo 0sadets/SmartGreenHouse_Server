@@ -1,11 +1,7 @@
-﻿using System.Text.Json.Serialization;
-
-namespace SmartGreenhouse.Models.Entities
+﻿namespace SmartGreenhouse.Models.DTOs
 {
-    public class UserSetting
+    public class CreateUserSettingsDto
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
         public int GreenhouseId { get; set; }
 
         public float AirTempMin { get; set; }
@@ -24,10 +20,5 @@ namespace SmartGreenhouse.Models.Entities
         public float LightMax { get; set; }
 
         public float LightHoursPerDay { get; set; }
-
-        public AppUser User { get; set; }
-        [JsonIgnore]
-        public Greenhouse Greenhouse { get; set; }
     }
-
 }
