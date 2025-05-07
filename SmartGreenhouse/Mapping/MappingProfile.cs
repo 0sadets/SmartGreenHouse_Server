@@ -8,6 +8,24 @@ namespace SmartGreenhouse.Mapping
     {
         public MappingProfile() {
 
+            // Мапінг для реєстрації користувача
+            CreateMap<RegisterDto, AppUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+
+            // Мапінг для входу користувача
+            CreateMap<LoginDto, AppUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password)); 
+
+            // Мапінг для передачі даних користувача в DTO 
+            CreateMap<AppUser, UserDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Greenhouses, opt => opt.MapFrom(src => src.Greenhouses)) 
+                .ForMember(dest => dest.UserSettings, opt => opt.MapFrom(src => src.UserSettings)); 
+
+
             CreateMap<GreenhouseCreateDto, Greenhouse>();
             CreateMap<GreenhouseUpdateDto, Greenhouse>();
             CreateMap<Greenhouse, GreenhouseReadDto>();
@@ -20,8 +38,9 @@ namespace SmartGreenhouse.Mapping
             CreateMap<Greenhouse, GreenhouseReadDto>()
                 .ForMember(dest => dest.Plants, opt => opt.MapFrom(src => src.Plants));
 
-            CreateMap<UserSetting, CreateUserSettingsDto>();
+            CreateMap<UserSetting, CreateUserSettingsDto>().ReverseMap();
 
+            CreateMap<SensorReadingCreateDto, SensorReading>();
 
 
 

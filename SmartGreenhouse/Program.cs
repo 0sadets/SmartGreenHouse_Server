@@ -54,17 +54,19 @@ namespace SmartGreenhouse
                     return new BadRequestObjectResult(new { success = false, errors });
                 };
             });
-            builder.Services.AddControllers();
+            
             // services
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IPlantService, PlantService>();
             builder.Services.AddScoped<IGreenhouseService, GreenhouseService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<ISensorService, SensorService>();
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-            
+
+            //builder.WebHost.UseUrls("http://192.168.1.101:5004");
 
 
 
@@ -74,6 +76,8 @@ namespace SmartGreenhouse
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddAutoMapper(typeof(Program));
+
+            builder.WebHost.UseUrls("http://0.0.0.0:5004");
 
             var app = builder.Build();
 
@@ -85,7 +89,7 @@ namespace SmartGreenhouse
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -94,6 +98,9 @@ namespace SmartGreenhouse
             app.MapControllers();
 
             app.Run();
+          
+
+
         }
     }
 

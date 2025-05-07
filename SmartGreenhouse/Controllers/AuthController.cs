@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.DTOs;
 using SmartGreenhouse.Models.Entities;
+using SmartGreenhouse.Validation;
 
 namespace SmartGreenhouse.Controllers
 {
@@ -31,6 +32,13 @@ namespace SmartGreenhouse.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
+            var validator = new RegisterDtoValidator();
+            var validationResult = await validator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
             var user = new AppUser
             {
                 UserName = dto.UserName,
