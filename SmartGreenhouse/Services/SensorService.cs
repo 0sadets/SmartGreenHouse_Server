@@ -19,7 +19,7 @@ namespace SmartGreenhouse.Services
         public void AddSensorReading(SensorReadingCreateDto dto)
         {
             var reading = _mapper.Map<SensorReading>(dto);
-
+            reading.Timestamp = DateTime.UtcNow;
             _repository.Create(reading);
             _repository.Save();
         }
