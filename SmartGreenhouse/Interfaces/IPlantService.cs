@@ -8,7 +8,7 @@ namespace SmartGreenhouse.Interfaces
         IEnumerable<PlantReadDto> GetAllPlantsWithExamples();
         PlantReadDto GetPlantById(int id);
         PlantReadDto GetPlantByCategory(string category);
-
+        IEnumerable<PlantExampleReadDto> GetPlantsExamples();
     }
 
 }

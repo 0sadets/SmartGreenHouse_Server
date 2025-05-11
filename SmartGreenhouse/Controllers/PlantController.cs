@@ -36,6 +36,13 @@ namespace SmartGreenhouse.Controllers
             if (plant == null) return NotFound("Plant category not found");
             return Ok(plant);
         }
+        [HttpGet("categories-with-examples")]
+        public IActionResult GetCategoriesWithExamples()
+        {
+            var categoriesWithExamples = _plantService.GetPlantsExamples();
+            return Ok(categoriesWithExamples);
+        }
+
     }
 
 

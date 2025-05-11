@@ -32,5 +32,22 @@ namespace SmartGreenhouse.Services
             var plant = _plantRepository.Get(p => p.Id == id).FirstOrDefault();
             return _mapper.Map<PlantReadDto>(plant);
         }
+
+        public IEnumerable<PlantExampleReadDto> GetPlantsExamples()
+        {
+            var plants = _plantRepository.Get();
+
+            return plants.Select(p => new PlantExampleReadDto
+            {
+                Category = p.Category,
+                ExampleNames = p.ExampleNames
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(name => name.Trim())
+                    .ToList()
+            }).ToList();
+        }
+
+
+
     }
 }
