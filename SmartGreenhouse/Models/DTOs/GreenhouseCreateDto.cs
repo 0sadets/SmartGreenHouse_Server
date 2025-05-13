@@ -10,6 +10,7 @@
         public string Location { get; set; }
 
         public List<int> PlantIds { get; set; }
+
     }
 
 

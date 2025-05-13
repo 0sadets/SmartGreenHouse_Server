@@ -6,9 +6,8 @@ using System.Security.Claims;
 
 namespace SmartGreenhouse.Controllers
 {
-    //[Authorize]
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class GreenhouseController : ControllerBase
     {
         private readonly IGreenhouseService _greenhouseService;
@@ -17,21 +16,29 @@ namespace SmartGreenhouse.Controllers
         {
             _greenhouseService = greenhouseService;
         }
+        [Authorize]
+        [HttpGet("test")]
+        public IActionResult Test() => Ok("Працює");
 
+
+
+        [Authorize]
         [HttpPost("create")]
         public async Task<IActionResult> CreateGreenhouse([FromBody] GreenhouseCreateDto dto)
         {
-            //var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
 
-            //if (userIdClaim == null)
-            //    return Unauthorized("Користувач не авторизований.");
 
-            int userId = 1; //int.Parse(userIdClaim.Value);
+            if (userIdClaim == null)
+                return Unauthorized("Користувач не авторизований.");
+
+            int userId = int.Parse(userIdClaim.Value);
+            //int userId = 1;
 
             try
             {
                 var greenhouse = await _greenhouseService.CreateWithOptimalSettingsAsync(dto, userId);
-                return Ok(greenhouse); // Можеш замінити на DTO, якщо хочеш обмежити поля
+                return Ok(greenhouse); 
             }
             catch (ArgumentException ex)
             {

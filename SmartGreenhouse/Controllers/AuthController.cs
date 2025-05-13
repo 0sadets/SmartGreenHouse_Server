@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.DTOs;
 using SmartGreenhouse.Models.Entities;
 using SmartGreenhouse.Validation;
+using System.Security.Claims;
 
 namespace SmartGreenhouse.Controllers
 {
@@ -28,7 +30,18 @@ namespace SmartGreenhouse.Controllers
             _authService = authService;
             _userRepository = userRepository;
         }
+        [Authorize]
+        [HttpGet("whoami")]
+        public IActionResult WhoAmI()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("User ID claim is missing");
+            }
+            return Ok($"Ваш ID: {userIdClaim.Value}");
 
+        }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -39,6 +52,7 @@ namespace SmartGreenhouse.Controllers
             {
                 return BadRequest(validationResult.Errors);
             }
+
             var user = new AppUser
             {
                 UserName = dto.UserName,
@@ -49,8 +63,12 @@ namespace SmartGreenhouse.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            return Ok("Registration successful.");
+            var accessToken = await _authService.GenerateAccessToken(user);
+            var refreshToken = await _authService.GenerateAndStoreRefreshToken(user);
+
+            return Ok(new { accessToken, refreshToken });
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)

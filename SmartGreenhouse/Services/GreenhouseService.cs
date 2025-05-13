@@ -103,9 +103,10 @@ namespace SmartGreenhouse.Services
         public async Task<Greenhouse> CreateWithOptimalSettingsAsync(GreenhouseCreateDto dto, int userId)
         {
             var selectedPlants = _plantRepository.Get(p => dto.PlantIds.Contains(p.Id)).ToList();
-
             if (selectedPlants.Count != dto.PlantIds.Count)
                 throw new ArgumentException("Деякі обрані рослини не знайдено.");
+
+            Console.WriteLine($"Selected Plants Count: {selectedPlants.Count}"); 
 
             var greenhouse = new Greenhouse
             {
@@ -119,29 +120,28 @@ namespace SmartGreenhouse.Services
                 Plants = selectedPlants
             };
 
-            _repository.Create(greenhouse);
-            _repository.Save();
+            Console.WriteLine($"Created Greenhouse: {greenhouse.Name}");
+
+            Create(greenhouse);
+            Save();
 
             var settingDto = new CreateUserSettingsDto
             {
                 GreenhouseId = greenhouse.Id,
-
                 AirTempMin = selectedPlants.Min(p => p.OptimalAirTempMin),
                 AirTempMax = selectedPlants.Max(p => p.OptimalAirTempMax),
-
                 AirHumidityMin = selectedPlants.Min(p => p.OptimalAirHumidityMin),
                 AirHumidityMax = selectedPlants.Max(p => p.OptimalAirHumidityMax),
-
                 SoilHumidityMin = selectedPlants.Min(p => p.OptimalSoilHumidityMin),
                 SoilHumidityMax = selectedPlants.Max(p => p.OptimalSoilHumidityMax),
-
                 SoilTempMin = selectedPlants.Min(p => p.OptimalSoilTempMin),
                 SoilTempMax = selectedPlants.Max(p => p.OptimalSoilTempMax),
-
                 LightMin = selectedPlants.Min(p => p.OptimalLightMin),
                 LightMax = selectedPlants.Max(p => p.OptimalLightMax),
                 LightHoursPerDay = selectedPlants.Average(p => p.OptimalLightHourPerDay)
             };
+
+            Console.WriteLine($"Created UserSettings: GreenhouseId = {settingDto.GreenhouseId}");
 
             var setting = _mapper.Map<UserSetting>(settingDto);
             setting.UserId = userId;
@@ -151,6 +151,7 @@ namespace SmartGreenhouse.Services
 
             return greenhouse;
         }
+
 
     }
 }

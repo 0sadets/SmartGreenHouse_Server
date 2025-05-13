@@ -39,6 +39,7 @@ namespace SmartGreenhouse.Services
 
             return plants.Select(p => new PlantExampleReadDto
             {
+                Id = p.Id,
                 Category = p.Category,
                 ExampleNames = p.ExampleNames
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)

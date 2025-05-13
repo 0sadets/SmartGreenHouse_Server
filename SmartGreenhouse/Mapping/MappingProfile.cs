@@ -8,17 +8,14 @@ namespace SmartGreenhouse.Mapping
     {
         public MappingProfile() {
 
-            // Мапінг для реєстрації користувача
             CreateMap<RegisterDto, AppUser>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
 
-            // Мапінг для входу користувача
             CreateMap<LoginDto, AppUser>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password)); 
 
-            // Мапінг для передачі даних користувача в DTO 
             CreateMap<AppUser, UserDto>()
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))

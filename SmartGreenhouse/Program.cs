@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartGreenhouse.Interfaces;
@@ -9,6 +8,11 @@ using SmartGreenhouse.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models;
+
 namespace SmartGreenhouse
 {
     public class Program
@@ -16,11 +20,7 @@ namespace SmartGreenhouse
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddControllers()
-               .AddJsonOptions(options =>
-               {
-                   options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-               });
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -31,6 +31,9 @@ namespace SmartGreenhouse
             // Add services to the container.
             string connString = builder.Configuration.GetConnectionString("LocalDb")!;
             builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connString));
+            builder.Services.AddIdentity<AppUser, IdentityRole<int>>()
+                    .AddEntityFrameworkStores<AppDbContext>()
+                    .AddDefaultTokenProviders();
 
             // Add CORS policy
             builder.Services.AddCors(options =>
@@ -43,10 +46,38 @@ namespace SmartGreenhouse
                             .AllowAnyHeader();
                     });
             });
+            var jwt = builder.Configuration.GetSection("Jwt");
+            var secretKey = jwt.GetValue<string>("Key");
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                throw new InvalidOperationException("JWT Secret Key is missing or empty in appsettings.json.");
+            }
+            builder.Services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-            builder.Services.AddIdentity<AppUser, IdentityRole<int>>()
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = "GrowGuard",
+                    ValidAudience = "MyGreenhouseAppUsers",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
+                };
+               
+
+            });
+
+
             // validators
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -60,7 +91,7 @@ namespace SmartGreenhouse
                     return new BadRequestObjectResult(new { success = false, errors });
                 };
             });
-            
+
             // services
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IPlantService, PlantService>();
@@ -72,15 +103,39 @@ namespace SmartGreenhouse
 
             builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-            //builder.WebHost.UseUrls("http://192.168.1.101:5004");
+            builder.Services.AddAuthorization();
 
 
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "Please enter token"
+                });
 
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
+            
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
             builder.Services.AddAutoMapper(typeof(Program));
 
             builder.WebHost.UseUrls("http://0.0.0.0:5004");
@@ -94,20 +149,17 @@ namespace SmartGreenhouse
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
             app.UseCors("AllowAll");
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
-
-
 
             app.MapControllers();
 
             app.Run();
-          
-
-
         }
     }
-
 }
