@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartGreenhouse;
 
@@ -11,9 +12,11 @@ using SmartGreenhouse;
 namespace SmartGreenhouse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250517141622_DeviceTable")]
+    partial class DeviceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,10 +561,6 @@ namespace SmartGreenhouse.Migrations
 
                     b.Property<float>("AirTemp")
                         .HasColumnType("real");
-
-                    b.Property<string>("DeviceSerialNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GreenhouseId")
                         .HasColumnType("int");

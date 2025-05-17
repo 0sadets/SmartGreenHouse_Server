@@ -18,6 +18,7 @@ namespace SmartGreenhouse
         public DbSet<UserSetting> UserSettings { get; set; }
         public DbSet<Plant> Plants { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Device> Devices { get; set; }
 
 
 

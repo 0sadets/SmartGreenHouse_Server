@@ -13,6 +13,11 @@ namespace SmartGreenhouse.Interfaces
         void Save();
 
         Task<Greenhouse> CreateWithOptimalSettingsAsync(GreenhouseCreateDto dto, int userId);
+        GreenhouseRecommendationDto GetRecommendation(GreenhouseCreateDto dto, List<Plant> selectedPlants);
+        GreenhouseRecommendationDto GetRecommendationByGreenhouseId(int greenhouseId);
+        GreenhouseStatusDto EvaluateGreenhouseStatus(int greenhouseId);
+
+
 
     }
 }

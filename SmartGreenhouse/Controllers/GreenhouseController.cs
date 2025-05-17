@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.DTOs;
+using SmartGreenhouse.Models.Entities;
 using System.Security.Claims;
 
 namespace SmartGreenhouse.Controllers
@@ -12,15 +13,13 @@ namespace SmartGreenhouse.Controllers
     {
         private readonly IGreenhouseService _greenhouseService;
 
-        public GreenhouseController(IGreenhouseService greenhouseService)
+        private readonly IRepository<Plant> _plantRepository;
+
+        public GreenhouseController(IGreenhouseService greenhouseService, IRepository<Plant> plantRepository)
         {
             _greenhouseService = greenhouseService;
+            _plantRepository = plantRepository;
         }
-        [Authorize]
-        [HttpGet("test")]
-        public IActionResult Test() => Ok("Працює");
-
-
 
         [Authorize]
         [HttpPost("create")]
@@ -45,5 +44,33 @@ namespace SmartGreenhouse.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("{id}/recommendation")]
+        public IActionResult GetRecommendation(int id)
+        {
+            try
+            {
+                var recommendation = _greenhouseService.GetRecommendationByGreenhouseId(id);
+                return Ok(recommendation);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        [HttpPost("status")]
+        public IActionResult CheckGreenhouseStatus([FromBody] int greenhouseId)
+        {
+            try
+            {
+                var status = _greenhouseService.EvaluateGreenhouseStatus(greenhouseId);
+                return Ok(status);
+
+            }
+            catch (ArgumentException ex) {
+                return StatusCode(500, $"Внутрішня помилка сервера, {ex.Message}");
+            }
+        }
+
+
     }
 }

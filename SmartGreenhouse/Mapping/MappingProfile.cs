@@ -39,7 +39,7 @@ namespace SmartGreenhouse.Mapping
             CreateMap<UserSetting, CreateUserSettingsDto>().ReverseMap();
 
             CreateMap<SensorReadingCreateDto, SensorReading>();
-
+            CreateMap<UserSetting, UserSettingsDto>();
 
 
         }

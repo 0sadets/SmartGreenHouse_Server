@@ -2,6 +2,7 @@
 {
     public class SensorReadingCreateDto
     {
+        public string DeviceSerialNumber { get; set; }
         public int GreenhouseId { get; set; }
         public float AirTemp { get; set; }
         public float AirHum { get; set; }

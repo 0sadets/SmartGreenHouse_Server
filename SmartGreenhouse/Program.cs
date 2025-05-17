@@ -98,6 +98,7 @@ namespace SmartGreenhouse
             builder.Services.AddScoped<IGreenhouseService, GreenhouseService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ISensorService, SensorService>();
+            builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

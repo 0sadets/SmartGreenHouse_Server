@@ -30,18 +30,18 @@ namespace SmartGreenhouse.Controllers
             _authService = authService;
             _userRepository = userRepository;
         }
-        [Authorize]
-        [HttpGet("whoami")]
-        public IActionResult WhoAmI()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized("User ID claim is missing");
-            }
-            return Ok($"Ваш ID: {userIdClaim.Value}");
+        //[Authorize]
+        //[HttpGet("whoami")]
+        //public IActionResult WhoAmI()
+        //{
+        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        //    if (userIdClaim == null)
+        //    {
+        //        return Unauthorized("User ID claim is missing");
+        //    }
+        //    return Ok($"Ваш ID: {userIdClaim.Value}");
 
-        }
+        //}
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {

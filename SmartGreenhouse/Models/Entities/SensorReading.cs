@@ -10,6 +10,7 @@
         public float SoilHum { get; set; }
         public float SoilTemp { get; set; }
         public float LightLevel { get; set; }
+        public string DeviceSerialNumber { get; set; }
 
         public Greenhouse Greenhouse { get; set; }
     }
