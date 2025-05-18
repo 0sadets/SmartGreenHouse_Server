@@ -32,7 +32,6 @@ namespace SmartGreenhouse.Controllers
                 return Unauthorized("Користувач не авторизований.");
 
             int userId = int.Parse(userIdClaim.Value);
-            //int userId = 1;
 
             try
             {
@@ -69,6 +68,17 @@ namespace SmartGreenhouse.Controllers
             catch (ArgumentException ex) {
                 return StatusCode(500, $"Внутрішня помилка сервера, {ex.Message}");
             }
+        }
+        [HttpGet("user-greenhouses")]
+        [Authorize]
+        public IActionResult GetUserGreenhouses()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdStr, out int userId))
+                return Unauthorized("ID користувача не знайдено або невалідне.");
+
+            var result = _greenhouseService.GetGreenhousesByUserId(userId);
+            return Ok(result);
         }
 
 

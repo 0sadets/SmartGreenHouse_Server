@@ -17,6 +17,7 @@ namespace SmartGreenhouse.Interfaces
         GreenhouseRecommendationDto GetRecommendationByGreenhouseId(int greenhouseId);
         GreenhouseStatusDto EvaluateGreenhouseStatus(int greenhouseId);
 
+        IEnumerable<GreenhouseReadDto> GetGreenhousesByUserId(int userId);
 
 
     }

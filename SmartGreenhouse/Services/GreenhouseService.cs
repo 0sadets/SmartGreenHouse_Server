@@ -282,15 +282,50 @@ namespace SmartGreenhouse.Services
             Check("Температура ґрунту", reading.SoilTemp, userSettings.SoilTempMin, userSettings.SoilTempMax);
             Check("Освітленість", reading.LightLevel, userSettings.LightMin, userSettings.LightMax);
 
-            result.Status = criticalCount > 0 ? "Critical"
-                         : warningCount > 0 ? "Warning"
-                         : "Normal";
+            result.Status = criticalCount > 0 ? "error"
+                 : warningCount > 0 ? "warning"
+                 : "good";
+
 
             return result;
         }
 
+        public IEnumerable<GreenhouseReadDto> GetGreenhousesByUserId(int userId)
+        {
+            var greenhouses = _repository.Get(
+               filter: g => g.UserId == userId,
+               includeProperties: "Plants" 
+            );
+            var result = greenhouses.Select(g => new GreenhouseReadDto
+            {
+                Id = g.Id,
+                Name = g.Name,
+                Length = g.Length,
+                Width = g.Width,
+                Height = g.Height,
+                Season = g.Season,
+                Location = g.Location,
+                Plants = g.Plants.Select(p => new PlantReadDto
+                {
+                    Id = p.Id,
+                    Category = p.Category,
+                    OptimalAirTempMin = p.OptimalAirTempMin,
+                    OptimalAirTempMax = p.OptimalAirTempMax,
+                    OptimalAirHumidityMin = p.OptimalAirHumidityMin,
+                    OptimalAirHumidityMax = p.OptimalAirHumidityMax,
+                    OptimalSoilHumidityMin = p.OptimalSoilHumidityMin,
+                    OptimalSoilHumidityMax = p.OptimalSoilHumidityMax,
+                    OptimalSoilTempMax = p.OptimalSoilTempMax,
+                    OptimalSoilTempMin = p.OptimalSoilTempMin,
+                    OptimalLightMin = p.OptimalLightMin,
+                    OptimalLightMax = p.OptimalLightMax,
+                    OptimalLightHourPerDay = p.OptimalLightHourPerDay,
+                    ExampleNames = p.ExampleNames,
+                    Features = p.Features
+                }).ToList()
+            });
 
-
-
+            return result;
+        }
     }
 }
