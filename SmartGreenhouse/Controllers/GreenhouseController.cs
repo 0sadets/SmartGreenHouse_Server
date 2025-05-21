@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace SmartGreenhouse.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class GreenhouseController : ControllerBase
@@ -21,7 +22,7 @@ namespace SmartGreenhouse.Controllers
             _plantRepository = plantRepository;
         }
 
-        [Authorize]
+        
         [HttpPost("create")]
         public async Task<IActionResult> CreateGreenhouse([FromBody] GreenhouseCreateDto dto)
         {
@@ -61,16 +62,19 @@ namespace SmartGreenhouse.Controllers
         {
             try
             {
-                var status = _greenhouseService.EvaluateGreenhouseStatus(greenhouseId);
+                var status = _greenhouseService.SaveGreenhouseStatusRecord(greenhouseId);
+                // Тепер status вже містить оновлений статус, не потрібно знову викликати Evaluate
                 return Ok(status);
-
             }
-            catch (ArgumentException ex) {
+            catch (ArgumentException ex)
+            {
                 return StatusCode(500, $"Внутрішня помилка сервера, {ex.Message}");
             }
         }
+
+
         [HttpGet("user-greenhouses")]
-        [Authorize]
+        
         public IActionResult GetUserGreenhouses()
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -80,7 +84,23 @@ namespace SmartGreenhouse.Controllers
             var result = _greenhouseService.GetGreenhousesByUserId(userId);
             return Ok(result);
         }
+        [HttpGet("{greenhouseId}")]
+        public ActionResult<GreenhouseReadDto> GetGreenhouseById(int greenhouseId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
+            if (userIdClaim == null)
+                return Unauthorized(new { message = "Користувач не авторизований" });
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var greenhouse = _greenhouseService.GetById(userId, greenhouseId);
+
+            if (greenhouse == null)
+                return NotFound(new { message = "Теплиця не знайдена або не належить користувачу." });
+
+            return Ok(greenhouse);
+        }
 
     }
 }

@@ -19,7 +19,7 @@ namespace SmartGreenhouse
         public DbSet<Plant> Plants { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Device> Devices { get; set; }
-
+        public DbSet<GreenhouseStatusRecord> GreenhouseStatuses { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

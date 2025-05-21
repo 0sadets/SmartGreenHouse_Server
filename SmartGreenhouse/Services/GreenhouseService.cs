@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.DTOs;
 using SmartGreenhouse.Models.Entities;
@@ -15,7 +16,7 @@ namespace SmartGreenhouse.Services
         private readonly IRepository<Device> _deviceRepository;
         private readonly IUserSettingsService _userSettingsService;
         private readonly IRepository<SensorReading> _sensorReadingRepository;
-
+        private readonly IRepository<GreenhouseStatusRecord> _statusRecordRepository;
 
         public GreenhouseService(
             IRepository<Greenhouse> repository,
@@ -23,7 +24,8 @@ namespace SmartGreenhouse.Services
             IRepository<UserSetting> userSettingRepository, IMapper mapper,
             IRepository<Device> deviceRepository,
              IUserSettingsService userSettingsService,
-             IRepository<SensorReading> sensorReadingRepository
+             IRepository<SensorReading> sensorReadingRepository,
+             IRepository<GreenhouseStatusRecord> statusRecordRepository
             ) 
      
         {
@@ -34,6 +36,7 @@ namespace SmartGreenhouse.Services
             _deviceRepository = deviceRepository;
             _userSettingsService = userSettingsService;
             _sensorReadingRepository = sensorReadingRepository;
+            _statusRecordRepository = statusRecordRepository;
         }
 
         public IEnumerable<Greenhouse> GetAll()
@@ -41,9 +44,45 @@ namespace SmartGreenhouse.Services
             return _repository.Get(includeProperties: "Plants,UserSettings");
         }
 
-        public Greenhouse GetById(int id)
+        public GreenhouseReadDto? GetById(int userId, int greenhouseId)
         {
-            return _repository.GetById(id);
+            var greenhouse = _repository.Get(
+                filter: g => g.UserId == userId && g.Id == greenhouseId,
+                includeProperties: "Plants"
+            ).FirstOrDefault();
+
+            if (greenhouse == null)
+                return null;
+
+            return new GreenhouseReadDto
+            {
+                Id = greenhouse.Id,
+                Name = greenhouse.Name,
+                Length = greenhouse.Length,
+                Width = greenhouse.Width,
+                Height = greenhouse.Height,
+                Season = greenhouse.Season,
+                Location = greenhouse.Location,
+                Plants = greenhouse.Plants.Select(p => new PlantReadDto
+                {
+                    Id = p.Id,
+                    Category = p.Category,
+                    OptimalAirTempMin = p.OptimalAirTempMin,
+                    OptimalAirTempMax = p.OptimalAirTempMax,
+                    OptimalAirHumidityMin = p.OptimalAirHumidityMin,
+                    OptimalAirHumidityMax = p.OptimalAirHumidityMax,
+                    OptimalSoilHumidityMin = p.OptimalSoilHumidityMin,
+                    OptimalSoilHumidityMax = p.OptimalSoilHumidityMax,
+                    OptimalSoilTempMax = p.OptimalSoilTempMax,
+                    OptimalSoilTempMin = p.OptimalSoilTempMin,
+                    OptimalLightMin = p.OptimalLightMin,
+                    OptimalLightMax = p.OptimalLightMax,
+                    OptimalLightHourPerDay = p.OptimalLightHourPerDay,
+                    ExampleNames = p.ExampleNames,
+                    Features = p.Features
+                }).ToList()
+            };
+
         }
 
         public void Create(Greenhouse entity)
@@ -72,48 +111,6 @@ namespace SmartGreenhouse.Services
             if (selectedPlants.Count != dto.PlantIds.Count)
                 throw new ArgumentException("Деякі обрані рослини не знайдено.");
 
-            // 1. обчислюємо обєм теплиці
-            float volume = dto.Length * dto.Width * dto.Height;
-
-            // 2. коригувальний коефіцієнт в залежності від сезону
-            float tempAdjustment = 0;
-            float lightAdjustment = 0;
-
-            switch (dto.Season.ToLower())
-            {
-                case "winter":
-                    tempAdjustment = 2; // збільшуємо рекомендовану температуру
-                    lightAdjustment = 2; // більше годин світла
-                    break;
-                case "summer":
-                    tempAdjustment = -1; // трохи знижуємо
-                    lightAdjustment = -1;
-                    break;
-                case "spring":
-                case "autumn":
-                    tempAdjustment = 0;
-                    lightAdjustment = 0;
-                    break;
-            }
-
-            // 3. базові діапазони з урахуванням сезонного коригування
-            var settingDto = new CreateUserSettingsDto
-            {
-                GreenhouseId = 0, // тимчасово, оновимо пізніше
-                AirTempMin = selectedPlants.Min(p => p.OptimalAirTempMin) + tempAdjustment,
-                AirTempMax = selectedPlants.Max(p => p.OptimalAirTempMax) + tempAdjustment,
-                AirHumidityMin = selectedPlants.Min(p => p.OptimalAirHumidityMin),
-                AirHumidityMax = selectedPlants.Max(p => p.OptimalAirHumidityMax),
-                SoilHumidityMin = selectedPlants.Min(p => p.OptimalSoilHumidityMin),
-                SoilHumidityMax = selectedPlants.Max(p => p.OptimalSoilHumidityMax),
-                SoilTempMin = selectedPlants.Min(p => p.OptimalSoilTempMin) + tempAdjustment,
-                SoilTempMax = selectedPlants.Max(p => p.OptimalSoilTempMax) + tempAdjustment,
-                LightMin = selectedPlants.Min(p => p.OptimalLightMin),
-                LightMax = selectedPlants.Max(p => p.OptimalLightMax),
-                LightHoursPerDay = selectedPlants.Average(p => p.OptimalLightHourPerDay) + lightAdjustment
-            };
-
-            // 4. створення теплиці
             var greenhouse = new Greenhouse
             {
                 Name = dto.Name,
@@ -129,7 +126,7 @@ namespace SmartGreenhouse.Services
             Create(greenhouse);
             Save();
 
-            settingDto.GreenhouseId = greenhouse.Id;
+            var settingDto = _userSettingsService.GenerateOptimalSettings(greenhouse.Id);
 
             var setting = _mapper.Map<UserSetting>(settingDto);
             setting.UserId = userId;
@@ -156,13 +153,7 @@ namespace SmartGreenhouse.Services
             }
             _deviceRepository.Save();
 
-            // 6. Рекомендація (вивід у лог, поки не зберігаємо)
-            Console.WriteLine($"Рекомендація для теплиці '{greenhouse.Name}':");
-            Console.WriteLine($"- Обʼєм: {volume} м³");
-            Console.WriteLine($"- Сезон: {dto.Season}");
-            Console.WriteLine($"- Температура скоригована на: {tempAdjustment}°C");
-            Console.WriteLine($"- Світловий день скоригований на: {lightAdjustment} годин");
-            Console.WriteLine($"- LightHoursPerDay: {settingDto.LightHoursPerDay}");
+            
 
             return greenhouse;
         }
@@ -289,6 +280,37 @@ namespace SmartGreenhouse.Services
 
             return result;
         }
+
+        public GreenhouseStatusDto SaveGreenhouseStatusRecord(int greenhouseId)
+        {
+            var statusDto = EvaluateGreenhouseStatus(greenhouseId);
+
+            var newRecord = new GreenhouseStatusRecord
+            {
+                GreenhouseId = greenhouseId,
+                Timestamp = DateTime.UtcNow,
+                Status = statusDto.Status,
+                AlertsJson = JsonConvert.SerializeObject(statusDto.Alerts)
+            };
+
+            //var lastRecord = _statusRecordRepository
+            //    .Get(r => r.GreenhouseId == greenhouseId)
+            //    .OrderByDescending(r => r.Timestamp)
+            //    .FirstOrDefault();
+
+            //if (lastRecord != null &&
+            //    lastRecord.Status == newRecord.Status &&
+            //    lastRecord.AlertsJson == newRecord.AlertsJson)
+            //{
+            //    return statusDto;
+            //}
+
+            _statusRecordRepository.Create(newRecord);
+            _statusRecordRepository.Save();
+            return statusDto;
+        }
+
+
 
         public IEnumerable<GreenhouseReadDto> GetGreenhousesByUserId(int userId)
         {

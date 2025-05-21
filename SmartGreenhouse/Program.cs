@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using SmartGreenhouse.Hubs;
 
 namespace SmartGreenhouse
 {
@@ -20,7 +21,7 @@ namespace SmartGreenhouse
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddSignalR();
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -38,13 +39,14 @@ namespace SmartGreenhouse
             // Add CORS policy
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
-                    policy =>
-                    {
-                        policy.AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader();
-                    });
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(_ => true); // або вкажи конкретний origin
+                });
             });
             var jwt = builder.Configuration.GetSection("Jwt");
             var secretKey = jwt.GetValue<string>("Key");
@@ -157,6 +159,7 @@ namespace SmartGreenhouse
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.MapHub<SensorHub>("/sensorHub");
 
             app.MapControllers();
 

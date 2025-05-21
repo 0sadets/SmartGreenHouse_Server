@@ -6,7 +6,7 @@ namespace SmartGreenhouse.Interfaces
     public interface IGreenhouseService
     {
         IEnumerable<Greenhouse> GetAll();
-        Greenhouse GetById(int id);
+        //Greenhouse GetById(int id);
         void Create(Greenhouse entity);
         void Update(Greenhouse entity);
         void Delete(int id);
@@ -18,7 +18,7 @@ namespace SmartGreenhouse.Interfaces
         GreenhouseStatusDto EvaluateGreenhouseStatus(int greenhouseId);
 
         IEnumerable<GreenhouseReadDto> GetGreenhousesByUserId(int userId);
-
-
+        GreenhouseReadDto? GetById(int userId, int greenhouseId);
+        GreenhouseStatusDto SaveGreenhouseStatusRecord(int greenhouseId);
     }
 }

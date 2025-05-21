@@ -40,7 +40,7 @@ namespace SmartGreenhouse.Mapping
 
             CreateMap<SensorReadingCreateDto, SensorReading>();
             CreateMap<UserSetting, UserSettingsDto>();
-
+            CreateMap<GHStatusCreateDto, GreenhouseStatusRecord>();
 
         }
     }

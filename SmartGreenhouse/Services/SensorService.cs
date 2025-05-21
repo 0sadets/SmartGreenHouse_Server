@@ -10,22 +10,20 @@ namespace SmartGreenhouse.Services
         private readonly IRepository<SensorReading> _repository;
         private readonly IMapper _mapper;
         private readonly IRepository<Device> _deviceRepository;
+        private readonly IRepository<Greenhouse> _ghRepository;
+        private readonly IGreenhouseService _greenhouseService;
 
-        public SensorService(IRepository<SensorReading> repository, IMapper mapper, IRepository<Device> deviceRepository)
+        public SensorService(IRepository<SensorReading> repository, IMapper mapper, IRepository<Device> deviceRepository, IRepository<Greenhouse> ghRepository, IGreenhouseService greenhouseService)
         {
             _repository = repository;
             _mapper = mapper;
             _deviceRepository = deviceRepository;
+            _ghRepository = ghRepository;
+            _greenhouseService = greenhouseService;
         }
 
-        //public void AddSensorReading(SensorReadingCreateDto dto)
-        //{
-        //    var reading = _mapper.Map<SensorReading>(dto);
-        //    reading.Timestamp = DateTime.UtcNow;
-        //    _repository.Create(reading);
-        //    _repository.Save();
-        //}
-        public void AddSensorReading(SensorReadingCreateDto dto)
+
+        public GreenhouseStatusDto AddSensorReading(SensorReadingCreateDto dto)
         {
             var device = _deviceRepository.Get(d => d.SerialNumber == dto.DeviceSerialNumber).FirstOrDefault();
             if (device == null)
@@ -33,11 +31,16 @@ namespace SmartGreenhouse.Services
 
             var reading = _mapper.Map<SensorReading>(dto);
             reading.GreenhouseId = device.GreenhouseId;
-            reading.Timestamp = DateTime.UtcNow;
+            reading.Timestamp = DateTime.UtcNow.ToLocalTime();
 
             _repository.Create(reading);
             _repository.Save();
+
+            // Переоцінка статусу для правильного GreenhouseId
+            return _greenhouseService.SaveGreenhouseStatusRecord(device.GreenhouseId);
         }
+
+
 
     }
 }
