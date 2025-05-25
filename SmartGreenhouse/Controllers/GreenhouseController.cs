@@ -101,6 +101,23 @@ namespace SmartGreenhouse.Controllers
 
             return Ok(greenhouse);
         }
+        [HttpPost("assign-device")]
+        public async Task<IActionResult> AssignDevice([FromBody] AssignDeviceDto dto)
+        {
+            await _greenhouseService.AssignDeviceToGreenhouseAsync(dto.SerialNumber, dto.GreenhouseId);
+            return Ok();
+        }
+        [HttpGet("device/{serialNumber}/greenhouse-id")]
+        public IActionResult GetGreenhouseIdByDevice(string serialNumber = "ARDUINO-001")
+        {
+            var greenhouseId = _greenhouseService.GetAssignedGreenhouseId(serialNumber);
+            if (greenhouseId == null)
+                return NotFound("Пристрій не знайдено або не прив’язаний до теплиці.");
+
+            return Ok(greenhouseId);
+        }
+
+
 
     }
 }

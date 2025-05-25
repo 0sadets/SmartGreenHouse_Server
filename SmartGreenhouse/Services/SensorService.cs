@@ -39,6 +39,30 @@ namespace SmartGreenhouse.Services
             // Переоцінка статусу для правильного GreenhouseId
             return _greenhouseService.SaveGreenhouseStatusRecord(device.GreenhouseId);
         }
+        public SensorReadDto ReadSensorDataById(int ghId)
+        {
+            var readings = _repository.Get(r => r.GreenhouseId == ghId)
+                .OrderByDescending(r => r.Timestamp)
+                .ToList();
+
+            if (!readings.Any())
+                throw new InvalidOperationException("Дані з сенсорів для цієї теплиці не знайдені.");
+
+            var latestReading = readings.First();
+
+            var dto = new SensorReadDto
+            {
+                GreenhouseId = ghId,
+                AirTemp = latestReading.AirTemp,
+                AirHum = latestReading.AirHum,
+                SoilTemp = latestReading.SoilTemp,
+                SoilHum = latestReading.SoilHum,
+                LightLevel = latestReading.LightLevel
+            };
+
+            return dto;
+        }
+
 
 
 

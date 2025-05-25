@@ -20,5 +20,7 @@ namespace SmartGreenhouse.Interfaces
         IEnumerable<GreenhouseReadDto> GetGreenhousesByUserId(int userId);
         GreenhouseReadDto? GetById(int userId, int greenhouseId);
         GreenhouseStatusDto SaveGreenhouseStatusRecord(int greenhouseId);
+        Task AssignDeviceToGreenhouseAsync(string serialNumber, int greenhouseId);
+        int? GetAssignedGreenhouseId(string serialNumber);
     }
 }

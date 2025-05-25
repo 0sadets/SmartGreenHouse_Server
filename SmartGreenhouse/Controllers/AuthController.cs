@@ -109,6 +109,13 @@ namespace SmartGreenhouse.Controllers
 
             return Ok("Logged out successfully");
         }
+        [Authorize]
+        [HttpGet("validate-token")]
+        public IActionResult ValidateToken()
+        {
+            return Ok(new { valid = true });
+        }
+
     }
 
 }

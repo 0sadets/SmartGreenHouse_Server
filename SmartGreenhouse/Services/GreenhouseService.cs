@@ -135,28 +135,37 @@ namespace SmartGreenhouse.Services
             _userSettingRepository.Save();
 
             // 5.привязка аrduino
-            var existingDevice = _deviceRepository.Get(d => d.SerialNumber == "ARDUINO-001").FirstOrDefault();
-
-            if (existingDevice != null)
-            {
-                existingDevice.GreenhouseId = greenhouse.Id;
-                _deviceRepository.Update(existingDevice);
-            }
-            else
-            {
-                var device = new Device
-                {
-                    SerialNumber = "ARDUINO-001",
-                    GreenhouseId = greenhouse.Id
-                };
-                _deviceRepository.Create(device);
-            }
-            _deviceRepository.Save();
-
-            
+            await AssignDeviceToGreenhouseAsync("ARDUINO-001", greenhouse.Id);
 
             return greenhouse;
         }
+
+        public async Task AssignDeviceToGreenhouseAsync(string serialNumber, int greenhouseId)
+        {
+            var greenhouse = _repository.GetById(greenhouseId);
+            if (greenhouse == null)
+                throw new ArgumentException("Теплицю не знайдено.");
+
+            var device = _deviceRepository.Get(d => d.SerialNumber == serialNumber).FirstOrDefault();
+
+            if (device != null)
+            {
+                device.GreenhouseId = greenhouseId;
+                _deviceRepository.Update(device);
+            }
+            else
+            {
+                device = new Device
+                {
+                    SerialNumber = serialNumber,
+                    GreenhouseId = greenhouseId
+                };
+                _deviceRepository.Create(device);
+            }
+
+            _deviceRepository.Save();
+        }
+
 
         public GreenhouseRecommendationDto GetRecommendation(GreenhouseCreateDto dto, List<Plant> selectedPlants)
         {
@@ -237,7 +246,7 @@ namespace SmartGreenhouse.Services
 
             if (reading == null || string.IsNullOrWhiteSpace(reading.DeviceSerialNumber))
             {
-                result.Status = "NoData";
+                result.Status = "nodata";
                 result.Alerts.Add("Немає даних від сенсорів.");
                 return result;
             }
@@ -245,7 +254,7 @@ namespace SmartGreenhouse.Services
             var userSettings = _userSettingsService.GetByGreenhouseId(greenhouseId);
             if (userSettings == null)
             {
-                result.Status = "NoData";
+                result.Status = "nodata";
                 result.Alerts.Add("Налаштування не знайдено.");
                 return result;
             }
@@ -280,6 +289,15 @@ namespace SmartGreenhouse.Services
 
             return result;
         }
+        public int? GetAssignedGreenhouseId(string serialNumber)
+        {
+            var device = _deviceRepository
+                .Get(d => d.SerialNumber == serialNumber)
+                .FirstOrDefault();
+
+            return device?.GreenhouseId;
+        }
+
 
         public GreenhouseStatusDto SaveGreenhouseStatusRecord(int greenhouseId)
         {
@@ -293,17 +311,6 @@ namespace SmartGreenhouse.Services
                 AlertsJson = JsonConvert.SerializeObject(statusDto.Alerts)
             };
 
-            //var lastRecord = _statusRecordRepository
-            //    .Get(r => r.GreenhouseId == greenhouseId)
-            //    .OrderByDescending(r => r.Timestamp)
-            //    .FirstOrDefault();
-
-            //if (lastRecord != null &&
-            //    lastRecord.Status == newRecord.Status &&
-            //    lastRecord.AlertsJson == newRecord.AlertsJson)
-            //{
-            //    return statusDto;
-            //}
 
             _statusRecordRepository.Create(newRecord);
             _statusRecordRepository.Save();

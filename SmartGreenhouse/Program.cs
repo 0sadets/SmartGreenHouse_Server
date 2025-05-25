@@ -37,15 +37,26 @@ namespace SmartGreenhouse
                     .AddDefaultTokenProviders();
 
             // Add CORS policy
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(policy =>
+            //    {
+            //        policy
+            //            .AllowAnyHeader()
+            //            .AllowAnyMethod()
+            //            .AllowCredentials()
+            //            .SetIsOriginAllowed(_ => true); // або вкажи конкретний origin
+            //    });
+            //});
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .SetIsOriginAllowed(_ => true); // або вкажи конкретний origin
+                    policy.WithOrigins("http://localhost:8081", "http://192.168.1.101:8081")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+
                 });
             });
             var jwt = builder.Configuration.GetSection("Jwt");

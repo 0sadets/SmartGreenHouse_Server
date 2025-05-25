@@ -5,5 +5,6 @@ namespace SmartGreenhouse.Interfaces
     public interface ISensorService
     {
         GreenhouseStatusDto AddSensorReading(SensorReadingCreateDto dto);
+        SensorReadDto ReadSensorDataById(int ghId);
     }
 }
