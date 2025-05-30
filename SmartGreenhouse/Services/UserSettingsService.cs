@@ -113,10 +113,42 @@ namespace SmartGreenhouse.Services
                 SoilTempMax = selectedPlants.Max(p => p.OptimalSoilTempMax) + tempAdjustment,
                 LightMin = selectedPlants.Min(p => p.OptimalLightMin),
                 LightMax = selectedPlants.Max(p => p.OptimalLightMax),
-                LightHoursPerDay = selectedPlants.Average(p => p.OptimalLightHourPerDay) + lightAdjustment
+                //LightHoursPerDay = selectedPlants.Average(p => p.OptimalLightHourPerDay) + lightAdjustment
             };
 
             return settingDto;
+        }
+
+        public bool UpdateSettingsForGreenhouse(int greenhouseId, CreateUserSettingsDto dto)
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return false;
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var setting = _repository.Get(s => s.UserId == userId && s.GreenhouseId == greenhouseId).FirstOrDefault();
+            if (setting == null)
+            {
+                // Технічно цього не має бути, але на всяк випадок можна логувати або кидати помилку
+                return false;
+            }
+
+            // Оновлення полів
+            setting.AirTempMin = dto.AirTempMin;
+            setting.AirTempMax = dto.AirTempMax;
+            setting.AirHumidityMin = dto.AirHumidityMin;
+            setting.AirHumidityMax = dto.AirHumidityMax;
+            setting.SoilHumidityMin = dto.SoilHumidityMin;
+            setting.SoilHumidityMax = dto.SoilHumidityMax;
+            setting.SoilTempMin = dto.SoilTempMin;
+            setting.SoilTempMax = dto.SoilTempMax;
+            setting.LightMin = dto.LightMin;
+            setting.LightMax = dto.LightMax;
+
+            _repository.Update(setting);
+            _repository.Save();
+
+            return true;
         }
 
 

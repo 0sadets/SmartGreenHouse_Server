@@ -22,5 +22,6 @@ namespace SmartGreenhouse.Interfaces
         GreenhouseStatusDto SaveGreenhouseStatusRecord(int greenhouseId);
         Task AssignDeviceToGreenhouseAsync(string serialNumber, int greenhouseId);
         int? GetAssignedGreenhouseId(string serialNumber);
+        void UpdateGreenhouse(int greenhouseId, GreenhouseUpdateDto dto);
     }
 }

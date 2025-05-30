@@ -31,10 +31,28 @@ namespace SmartGreenhouse.Controllers
 
             await _hubContext.Clients
                 .Group(dto.GreenhouseId.ToString())
-                .SendAsync("GreenhouseStatusUpdated", new { status = statusDto.Status });
+                .SendAsync("GreenhouseStatusUpdated", new
+                {
+                    //status = statusDto.Status,
+                    status = new
+                    {
+                        statusDto.Status,
+                        statusDto.Alerts,
+                    },
+                    data = new
+                    {
+                        dto.GreenhouseId,
+                        dto.AirTemp,
+                        dto.AirHum,
+                        dto.SoilHum,
+                        dto.SoilTemp,
+                        dto.LightLevel
+                    }
+                });
 
 
-            Console.WriteLine($"📨 Надсилаємо статус до групи {dto.GreenhouseId}: {statusDto.Status}");
+            Console.WriteLine($"Надсилаємо статус до групи {dto.GreenhouseId}: {statusDto.Status}, {statusDto.Alerts}");
+            Console.WriteLine($"Надсилаємо дані  до групи {dto.GreenhouseId}: {dto.AirHum}, {dto.LightLevel}, {dto.AirTemp}, {dto.SoilHum}, {dto.SoilTemp}");
 
 
             return Ok(new { message = "Sensor reading saved and status updated." });

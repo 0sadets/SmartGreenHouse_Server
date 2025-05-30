@@ -9,6 +9,7 @@ namespace SmartGreenhouse.Interfaces
         bool UpdateUserSettings(int greenhouseId, UpdateUserSettingsDto dto);
         CreateUserSettingsDto GenerateOptimalSettings(int greenhouseId);
 
+        bool UpdateSettingsForGreenhouse(int greenhouseId, CreateUserSettingsDto dto);
 
 
     }

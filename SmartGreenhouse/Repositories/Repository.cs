@@ -48,7 +48,7 @@ namespace SmartGreenhouse.Repositories
                 query = query.Where(filter);
             }
 
-            foreach (var includeProperty in includeProperties)
+            foreach (var includeProperty in includeProperties)//.SelectMany(p => p.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
             {
                 query = query.Include(includeProperty);
             }

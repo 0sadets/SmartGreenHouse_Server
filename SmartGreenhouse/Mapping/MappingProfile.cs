@@ -24,7 +24,7 @@ namespace SmartGreenhouse.Mapping
 
 
             CreateMap<GreenhouseCreateDto, Greenhouse>();
-            CreateMap<GreenhouseUpdateDto, Greenhouse>();
+            //CreateMap<GreenhouseUpdateDto, Greenhouse>();
             CreateMap<Greenhouse, GreenhouseReadDto>();
 
             CreateMap<Plant, PlantReadDto>();
@@ -41,6 +41,11 @@ namespace SmartGreenhouse.Mapping
             CreateMap<SensorReadingCreateDto, SensorReading>();
             CreateMap<UserSetting, UserSettingsDto>();
             CreateMap<GHStatusCreateDto, GreenhouseStatusRecord>();
+
+            CreateMap<GreenhouseUpdateDto, Greenhouse>()
+                 .ForMember(dest => dest.Id, opt => opt.Ignore()) 
+                 .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                 .ForMember(dest => dest.Plants, opt => opt.Ignore());
 
         }
     }

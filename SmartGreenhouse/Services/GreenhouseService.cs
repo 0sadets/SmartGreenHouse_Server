@@ -356,5 +356,44 @@ namespace SmartGreenhouse.Services
 
             return result;
         }
+      
+        public void UpdateGreenhouse( int greenhouseId, GreenhouseUpdateDto dto)
+        {
+            var greenhouse = _repository.Get(
+                filter: g => g.Id == greenhouseId,
+                includeProperties: new[] { "Plants", "UserSettings" }
+            ).FirstOrDefault();
+
+
+            if (greenhouse == null)
+                throw new ArgumentException("Теплицю не знайдено або вона не належить цьому користувачу.");
+
+            // Зберігаємо старі параметри для перевірки
+            var oldSeason = greenhouse.Season;
+            var oldDimensions = (greenhouse.Length, greenhouse.Width, greenhouse.Height);
+
+            _mapper.Map(dto, greenhouse);
+
+            var newPlants = _plantRepository
+                .Get(filter: p => dto.PlantIds.Contains(p.Id)).ToList();
+
+            greenhouse.Plants = newPlants;
+
+            _repository.Update(greenhouse);
+            _repository.Save();
+
+            bool shouldRecalculate =
+                oldSeason != dto.Season ||
+                oldDimensions != (dto.Length, dto.Width, dto.Height) ||
+                dto.PlantIds.Any();
+
+            if (shouldRecalculate)
+            {
+                var newSettingsDto = _userSettingsService.GenerateOptimalSettings(greenhouseId);
+
+                _userSettingsService.UpdateSettingsForGreenhouse(greenhouseId, newSettingsDto);
+            }
+        }
+
     }
 }

@@ -37,28 +37,28 @@ namespace SmartGreenhouse
                     .AddDefaultTokenProviders();
 
             // Add CORS policy
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddDefaultPolicy(policy =>
-            //    {
-            //        policy
-            //            .AllowAnyHeader()
-            //            .AllowAnyMethod()
-            //            .AllowCredentials()
-            //            .SetIsOriginAllowed(_ => true); // або вкажи конкретний origin
-            //    });
-            //});
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowReactApp", policy =>
+                options.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins("http://localhost:8081", "http://192.168.1.101:8081")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-
+                    policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed(_ => true); // або вкажи конкретний origin
                 });
             });
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowReactApp", policy =>
+            //    {
+            //        policy.AllowAnyOrigin()//.WithOrigins("http://localhost:8081", "http://192.168.1.102:8081")
+            //              .AllowAnyHeader()
+            //              .AllowAnyMethod()
+            //              .AllowCredentials();
+
+            //    });
+            //});
             var jwt = builder.Configuration.GetSection("Jwt");
             var secretKey = jwt.GetValue<string>("Key");
             if (string.IsNullOrEmpty(secretKey))

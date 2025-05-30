@@ -19,6 +19,6 @@
         public float LightMin { get; set; }
         public float LightMax { get; set; }
 
-        public float LightHoursPerDay { get; set; }
+        //public float LightHoursPerDay { get; set; }
     }
 }

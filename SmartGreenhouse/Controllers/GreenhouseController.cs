@@ -117,6 +117,23 @@ namespace SmartGreenhouse.Controllers
             return Ok(greenhouseId);
         }
 
+        [HttpPut("{greenhouseId}")]
+        public IActionResult UpdateGreenhouse(int greenhouseId, [FromBody] GreenhouseUpdateDto dto)
+        {
+            try
+            {
+                _greenhouseService.UpdateGreenhouse( greenhouseId, dto);
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
 
     }
