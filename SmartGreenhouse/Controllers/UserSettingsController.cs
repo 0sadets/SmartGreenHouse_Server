@@ -42,8 +42,9 @@ namespace SmartGreenhouse.Controllers
         {
             try
             {
-                var result = _userSettingsService.GenerateOptimalSettings(greenhouseId);
-                return Ok(result);
+                var setting = _userSettingsService.GenerateAndSaveSettings(greenhouseId);
+
+                return Ok();
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
 ﻿using SmartGreenhouse.Models.DTOs;
+using SmartGreenhouse.Models.Entities;
 
 namespace SmartGreenhouse.Interfaces
 {
@@ -11,6 +12,6 @@ namespace SmartGreenhouse.Interfaces
 
         bool UpdateSettingsForGreenhouse(int greenhouseId, CreateUserSettingsDto dto);
 
-
+        UserSetting GenerateAndSaveSettings(int greenhouseId);
     }
 }

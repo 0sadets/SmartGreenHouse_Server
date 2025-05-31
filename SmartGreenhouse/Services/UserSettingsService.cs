@@ -3,6 +3,7 @@ using SmartGreenhouse.Interfaces;
 using SmartGreenhouse.Models.DTOs;
 using SmartGreenhouse.Models.Entities;
 using SmartGreenhouse.Repositories;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace SmartGreenhouse.Services
@@ -74,7 +75,10 @@ namespace SmartGreenhouse.Services
         }
         public CreateUserSettingsDto GenerateOptimalSettings(int greenhouseId)
         {
-            var greenhouse = _greenhouseRepository.GetById(greenhouseId);
+            var greenhouse = _greenhouseRepository
+                .Get(g => g.Id == greenhouseId, includeProperties: "Plants")
+                .FirstOrDefault();
+
             if (greenhouse == null)
                 throw new ArgumentException("Теплицю не знайдено.");
 
@@ -118,6 +122,31 @@ namespace SmartGreenhouse.Services
 
             return settingDto;
         }
+        public UserSetting GenerateAndSaveSettings(int greenhouseId)
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("Користувач не авторизований.");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var existingSettings = _repository.Get(us => us.GreenhouseId == greenhouseId).ToList();
+            foreach (var setting in existingSettings)
+            {
+                _repository.Delete(setting);
+            }
+
+            var dto = GenerateOptimalSettings(greenhouseId);
+
+            var entity = _mapper.Map<UserSetting>(dto);
+            entity.UserId = userId;
+
+            _repository.Create(entity);
+            _repository.Save();
+
+            return entity;
+        }
+
 
         public bool UpdateSettingsForGreenhouse(int greenhouseId, CreateUserSettingsDto dto)
         {
