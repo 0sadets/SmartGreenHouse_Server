@@ -17,6 +17,7 @@ namespace SmartGreenhouse.Services
         private readonly IUserSettingsService _userSettingsService;
         private readonly IRepository<SensorReading> _sensorReadingRepository;
         private readonly IRepository<GreenhouseStatusRecord> _statusRecordRepository;
+        private readonly IRepository<DeviceState> _deviceStateRepository;
 
         public GreenhouseService(
             IRepository<Greenhouse> repository,
@@ -25,7 +26,8 @@ namespace SmartGreenhouse.Services
             IRepository<Device> deviceRepository,
              IUserSettingsService userSettingsService,
              IRepository<SensorReading> sensorReadingRepository,
-             IRepository<GreenhouseStatusRecord> statusRecordRepository
+             IRepository<GreenhouseStatusRecord> statusRecordRepository,
+             IRepository<DeviceState> deviceStateRepository
             ) 
      
         {
@@ -37,6 +39,7 @@ namespace SmartGreenhouse.Services
             _userSettingsService = userSettingsService;
             _sensorReadingRepository = sensorReadingRepository;
             _statusRecordRepository = statusRecordRepository;
+            _deviceStateRepository = deviceStateRepository;
         }
 
         public IEnumerable<Greenhouse> GetAll()
@@ -134,9 +137,19 @@ namespace SmartGreenhouse.Services
             _userSettingRepository.Create(setting);
             _userSettingRepository.Save();
 
-            // 5.привязка аrduino
+            // привязка аrduino
             await AssignDeviceToGreenhouseAsync("ARDUINO-001", greenhouse.Id);
+            // ств початкових  станів
+            var initialDeviceState = new DeviceState
+            {
+                GreenhouseId = greenhouse.Id,
+                Timestamp = DateTime.UtcNow,
+                FanStatus = false,
+                DoorStatus = false
+            };
 
+            _deviceStateRepository.Create(initialDeviceState);
+            _deviceStateRepository.Save();
             return greenhouse;
         }
 
@@ -394,6 +407,42 @@ namespace SmartGreenhouse.Services
                 _userSettingsService.UpdateSettingsForGreenhouse(greenhouseId, newSettingsDto);
             }
         }
+        public void DeleteGreenhouseWithDependencies(int greenhouseId)
+        {
+            var greenhouse = _repository.Get(
+                filter: g => g.Id == greenhouseId,
+                includeProperties: "SensorReadings,DeviceStates,UserSettings,Plants"
+            ).FirstOrDefault();
+
+            if (greenhouse == null)
+                throw new Exception("Теплиця не знайдена.");
+
+            // Очистити зв’язки з Plants (Many-to-Many)
+            greenhouse.Plants.Clear();
+
+            // Видалити залежні сутності, якщо потрібно вручну:
+            foreach (var sensor in greenhouse.SensorReadings.ToList())
+            {
+                _sensorReadingRepository.Delete(sensor.Id);
+            }
+
+            foreach (var deviceState in greenhouse.DeviceStates.ToList())
+            {
+                _deviceRepository.Delete(deviceState.Id); // якщо це DeviceState репозиторій, назви можуть різнитися
+            }
+
+            foreach (var userSetting in greenhouse.UserSettings.ToList())
+            {
+                _userSettingRepository.Delete(userSetting.Id);
+            }
+
+            // Видалити саму теплицю
+            _repository.Delete(greenhouse.Id);
+
+            // Зберегти зміни
+            _repository.Save();
+        }
+
 
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using SmartGreenhouse.Hubs;
+using SmartGreenhouse.Configuration;
 
 namespace SmartGreenhouse
 {
@@ -52,7 +53,7 @@ namespace SmartGreenhouse
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:8081", "http://192.168.1.102:8081")
+                    policy.WithOrigins("http://localhost:8081", "http://192.168.1.100:8081")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -112,6 +113,7 @@ namespace SmartGreenhouse
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ISensorService, SensorService>();
             builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
+            builder.Services.AddScoped<IDeviceStateService, DeviceStateService>();
 
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

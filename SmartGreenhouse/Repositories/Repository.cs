@@ -48,7 +48,7 @@ namespace SmartGreenhouse.Repositories
                 query = query.Where(filter);
             }
 
-            foreach (var includeProperty in includeProperties)//.SelectMany(p => p.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
+            foreach (var includeProperty in includeProperties.SelectMany(p => p.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)))
             {
                 query = query.Include(includeProperty);
             }
@@ -80,5 +80,18 @@ namespace SmartGreenhouse.Repositories
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
         }
+        public async Task AddAsync(TEntity entity)
+        {
+            await dbSet.AddAsync(entity);
+        }
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await dbSet.ToListAsync();
+        }
+        public async Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
+        }
+
     }
 }

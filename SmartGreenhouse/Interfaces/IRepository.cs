@@ -17,5 +17,8 @@ namespace SmartGreenhouse.Interfaces
         void Delete(object id);
         void Delete(TEntity entityToDelete);
         void Save();
+        Task AddAsync(TEntity entity);
+        Task<List<TEntity>> GetAllAsync();
+        Task SaveAsync();
     }
 }

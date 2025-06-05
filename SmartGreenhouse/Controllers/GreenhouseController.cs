@@ -134,6 +134,19 @@ namespace SmartGreenhouse.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteGreenhouse(int id)
+        {
+            try
+            {
+                _greenhouseService.DeleteGreenhouseWithDependencies(id);
+                return NoContent(); // 204 - успішно, без тіла
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
 
 
     }
