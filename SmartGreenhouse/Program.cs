@@ -111,6 +111,7 @@ namespace SmartGreenhouse
             builder.Services.AddScoped<IPlantService, PlantService>();
             builder.Services.AddScoped<IGreenhouseService, GreenhouseService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ISensorService, SensorService>();
             builder.Services.AddScoped<IUserSettingsService, UserSettingsService>();
             builder.Services.AddScoped<IDeviceStateService, DeviceStateService>();

@@ -36,7 +36,6 @@ namespace SmartGreenhouse.Services
             _repository.Create(reading);
             _repository.Save();
 
-            // Переоцінка статусу для правильного GreenhouseId
             return _greenhouseService.SaveGreenhouseStatusRecord(device.GreenhouseId);
         }
         public SensorReadDto ReadSensorDataById(int ghId)

@@ -50,6 +50,12 @@ namespace SmartGreenhouse.Mapping
             .ForMember(dest => dest.ghId, opt => opt.MapFrom(src => src.GreenhouseId.ToString()));
             CreateMap<DeviceStateDto, DeviceState>()
                 .ForMember(dest => dest.GreenhouseId, opt => opt.MapFrom(src => int.Parse(src.ghId)));
+
+            CreateMap<AppUser, UserReadDto>();
+            CreateMap<UserUpdateDto, AppUser>()
+                .ForMember(dest => dest.UserName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.UserName)))
+                .ForMember(dest => dest.Email, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Email)));
+
         }
     }
 }

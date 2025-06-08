@@ -272,10 +272,20 @@ namespace SmartGreenhouse.Services
                 return result;
             }
 
+            var greenhouse = _repository.GetById(greenhouseId);
+            if (greenhouse == null)
+            {
+                result.Status = "nodata";
+                result.Alerts.Add("Теплицю не знайдено.");
+                return result;
+            }
+
+            string season = greenhouse.Season ?? "unknown";
+
             int criticalCount = 0;
             int warningCount = 0;
 
-            void Check(string name, float value, float min, float max)
+            void EvaluateParameter(string name, float value, float min, float max)
             {
                 if (value < min * 0.9 || value > max * 1.1)
                 {
@@ -289,19 +299,70 @@ namespace SmartGreenhouse.Services
                 }
             }
 
-            Check("Температура повітря", reading.AirTemp, userSettings.AirTempMin, userSettings.AirTempMax);
-            Check("Вологість повітря", reading.AirHum, userSettings.AirHumidityMin, userSettings.AirHumidityMax);
-            Check("Вологість ґрунту", reading.SoilHum, userSettings.SoilHumidityMin, userSettings.SoilHumidityMax);
-            Check("Температура ґрунту", reading.SoilTemp, userSettings.SoilTempMin, userSettings.SoilTempMax);
-            Check("Освітленість", reading.LightLevel, userSettings.LightMin, userSettings.LightMax);
+            float GetSeasonalLightFactor(string season)
+            {
+                return season.ToLower() switch
+                {
+                    "spring" => 1.0f,
+                    "summer" => 1.2f,
+                    "autumn" => 0.9f,
+                    "winter" => 0.7f,
+                    _ => 1.0f
+                };
+            }
+
+            EvaluateParameter("Температура повітря", reading.AirTemp, userSettings.AirTempMin, userSettings.AirTempMax);
+            EvaluateParameter("Вологість повітря", reading.AirHum, userSettings.AirHumidityMin, userSettings.AirHumidityMax);
+            EvaluateParameter("Вологість ґрунту", reading.SoilHum, userSettings.SoilHumidityMin, userSettings.SoilHumidityMax);
+            EvaluateParameter("Температура ґрунту", reading.SoilTemp, userSettings.SoilTempMin, userSettings.SoilTempMax);
+
+            var hour = reading.Timestamp.Hour;
+
+            if (!TryEvaluateLight(hour, reading.LightLevel, userSettings.LightMin, userSettings.LightMax, season))
+            {
+                result.Alerts.Add("Освітленість не перевірялась (нічний час).");
+            }
 
             result.Status = criticalCount > 0 ? "error"
-                 : warningCount > 0 ? "warning"
-                 : "good";
-
+                         : warningCount > 0 ? "warning"
+                         : "good";
 
             return result;
         }
+        private bool TryEvaluateLight(int hour, float lightLevel, float lightMin, float lightMax, string season)
+        {
+            bool isDay = hour >= 6 && hour <= 20;
+
+            if (!isDay)
+            {
+                return false;
+            }
+
+            float seasonalFactor = season.ToLower() switch
+            {
+                "spring" => 1.0f,
+                "summer" => 1.2f,
+                "autumn" => 0.9f,
+                "winter" => 0.7f,
+                _ => 1.0f
+            };
+
+            float expectedMin = lightMin * seasonalFactor;
+            float expectedMax = lightMax * seasonalFactor;
+
+            if (lightLevel < expectedMin * 0.9 || lightLevel > expectedMax * 1.1)
+            {
+                return false; 
+            }
+            else if (lightLevel < expectedMin || lightLevel > expectedMax)
+            {
+                return true;
+            }
+
+            return true;
+        }
+
+
         public int? GetAssignedGreenhouseId(string serialNumber)
         {
             var device = _deviceRepository
@@ -381,7 +442,6 @@ namespace SmartGreenhouse.Services
             if (greenhouse == null)
                 throw new ArgumentException("Теплицю не знайдено або вона не належить цьому користувачу.");
 
-            // Зберігаємо старі параметри для перевірки
             var oldSeason = greenhouse.Season;
             var oldDimensions = (greenhouse.Length, greenhouse.Width, greenhouse.Height);
 
@@ -417,31 +477,38 @@ namespace SmartGreenhouse.Services
             if (greenhouse == null)
                 throw new Exception("Теплиця не знайдена.");
 
-            // Очистити зв’язки з Plants (Many-to-Many)
-            greenhouse.Plants.Clear();
+            if (greenhouse.Plants != null)
+                greenhouse.Plants.Clear();
 
-            // Видалити залежні сутності, якщо потрібно вручну:
-            foreach (var sensor in greenhouse.SensorReadings.ToList())
+            if (greenhouse.SensorReadings != null)
             {
-                _sensorReadingRepository.Delete(sensor.Id);
+                foreach (var sensor in greenhouse.SensorReadings.ToList())
+                {
+                    _sensorReadingRepository.Delete(sensor);
+                }
             }
 
-            foreach (var deviceState in greenhouse.DeviceStates.ToList())
+            if (greenhouse.DeviceStates != null)
             {
-                _deviceRepository.Delete(deviceState.Id); // якщо це DeviceState репозиторій, назви можуть різнитися
+                foreach (var deviceState in greenhouse.DeviceStates.ToList())
+                {
+                    _deviceStateRepository.Delete(deviceState);
+                }
             }
 
-            foreach (var userSetting in greenhouse.UserSettings.ToList())
+            if (greenhouse.UserSettings != null)
             {
-                _userSettingRepository.Delete(userSetting.Id);
+                foreach (var userSetting in greenhouse.UserSettings.ToList())
+                {
+                    _userSettingRepository.Delete(userSetting);
+                }
             }
 
-            // Видалити саму теплицю
-            _repository.Delete(greenhouse.Id);
+            _repository.Delete(greenhouse);
 
-            // Зберегти зміни
             _repository.Save();
         }
+
 
 
     }

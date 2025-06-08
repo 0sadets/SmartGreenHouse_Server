@@ -24,8 +24,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 75,
                         OptimalSoilTempMin = 18,
                         OptimalSoilTempMax = 24,
-                        OptimalLightMin = 18000,
-                        OptimalLightMax = 30000,
+                        OptimalLightMin = 10000,
+                        OptimalLightMax = 22000,
                         OptimalLightHourPerDay = 10,
                         Features = "Огірки потребують більшої вологості, баклажани — стабільного тепла, перець — чутливий до перепадів температур."
                     },
@@ -42,8 +42,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 70,
                         OptimalSoilTempMin = 16,
                         OptimalSoilTempMax = 20,
-                        OptimalLightMin = 10000,
-                        OptimalLightMax = 20000,
+                        OptimalLightMin = 4000,
+                        OptimalLightMax = 15000,
                         OptimalLightHourPerDay = 8,
                         Features = "Базилік полюбляє тепліші умови, ніж інша зелень."
                     },
@@ -60,8 +60,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 80,
                         OptimalSoilTempMin = 10,
                         OptimalSoilTempMax = 18,
-                        OptimalLightMin = 15000,
-                        OptimalLightMax = 25000,
+                        OptimalLightMin = 6000,
+                        OptimalLightMax = 12000,
                         OptimalLightHourPerDay = 9,
                         Features = "Редис швидко росте в прохолодних умовах, картопля потребує глибокого ґрунту."
                     },
@@ -78,8 +78,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 80,
                         OptimalSoilTempMin = 15,
                         OptimalSoilTempMax = 20,
-                        OptimalLightMin = 20000,
-                        OptimalLightMax = 30000,
+                        OptimalLightMin = 10000,
+                        OptimalLightMax = 18000,
                         OptimalLightHourPerDay = 8,
                         Features = "Лохина потребує кислий ґрунт; малина не переносить застійної води."
                     },
@@ -96,8 +96,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 75,
                         OptimalSoilTempMin = 18,
                         OptimalSoilTempMax = 22,
-                        OptimalLightMin = 25000,
-                        OptimalLightMax = 35000,
+                        OptimalLightMin = 15000,
+                        OptimalLightMax = 22000,
                         OptimalLightHourPerDay = 10,
                         Features = "Цитрусові не переносять переохолодження; інжир потребує періоду спокою взимку."
                     },
@@ -114,8 +114,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 70,
                         OptimalSoilTempMin = 16,
                         OptimalSoilTempMax = 22,
-                        OptimalLightMin = 12000,
-                        OptimalLightMax = 25000,
+                        OptimalLightMin = 8000,
+                        OptimalLightMax = 16000,
                         OptimalLightHourPerDay = 8,
                         Features = "Орхідеї потребують розсіяного світла; тюльпани люблять прохолодні ночі."
                     },
@@ -132,8 +132,8 @@ namespace SmartGreenhouse.Models
                         OptimalSoilHumidityMax = 90,
                         OptimalSoilTempMin = 14,
                         OptimalSoilTempMax = 18,
-                        OptimalLightMin = 1000,
-                        OptimalLightMax = 5000,
+                        OptimalLightMin = 500,
+                        OptimalLightMax = 6000,
                         OptimalLightHourPerDay = 2,
                         Features = "Гриби не потребують багато світла; трюфелі ростуть у симбіозі з деревами."
                     }
