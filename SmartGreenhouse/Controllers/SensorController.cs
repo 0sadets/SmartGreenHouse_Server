@@ -75,7 +75,19 @@ namespace SmartGreenhouse.Controllers
             }
         }
 
-
+        [HttpGet("charts/{greenhouseId}")]
+        public async Task<ActionResult<Dictionary<string, SensorGraphDto>>> GetAllChartData(int greenhouseId)
+        {
+            try
+            {
+                var data = await _sensorService.GetAllChartDataAsync(greenhouseId);
+                return Ok(data);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
 
     }

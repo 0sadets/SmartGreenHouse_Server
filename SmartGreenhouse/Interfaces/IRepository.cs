@@ -18,5 +18,11 @@ namespace SmartGreenhouse.Interfaces
         Task AddAsync(TEntity entity);
         Task<List<TEntity>> GetAllAsync();
         Task SaveAsync();
+        Task<List<TEntity>> GetAsync(
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    string? includeProperties = null
+);
+
     }
 }

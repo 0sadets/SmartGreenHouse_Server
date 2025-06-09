@@ -12,14 +12,20 @@ namespace SmartGreenhouse.Services
         private readonly IRepository<Device> _deviceRepository;
         private readonly IRepository<Greenhouse> _ghRepository;
         private readonly IGreenhouseService _greenhouseService;
+        private readonly IUserSettingsService _usSettService;
 
-        public SensorService(IRepository<SensorReading> repository, IMapper mapper, IRepository<Device> deviceRepository, IRepository<Greenhouse> ghRepository, IGreenhouseService greenhouseService)
+        public SensorService(IRepository<SensorReading> repository, 
+            IMapper mapper, IRepository<Device> deviceRepository, 
+            IRepository<Greenhouse> ghRepository, 
+            IGreenhouseService greenhouseService,
+            IUserSettingsService usSettService)
         {
             _repository = repository;
             _mapper = mapper;
             _deviceRepository = deviceRepository;
             _ghRepository = ghRepository;
             _greenhouseService = greenhouseService;
+            _usSettService = usSettService;
         }
 
 
@@ -61,6 +67,64 @@ namespace SmartGreenhouse.Services
 
             return dto;
         }
+        public async Task<Dictionary<string, SensorGraphDto>> GetAllChartDataAsync(int greenhouseId)
+        {
+            var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+            var today = yesterday.AddDays(1);
+
+            var sensorData = await _repository.GetAsync(
+                filter: s => s.GreenhouseId == greenhouseId && s.Timestamp >= yesterday && s.Timestamp < today,
+                orderBy: q => q.OrderBy(x => x.Timestamp)
+            );
+
+            var greenhouse = (await _ghRepository.GetAsync(g => g.Id == greenhouseId)).FirstOrDefault();
+
+            if (greenhouse == null) throw new Exception("Теплиця не знайдена");
+
+            var settings = _usSettService.GetByGreenhouseId(greenhouseId);
+
+            if (settings == null)
+                throw new Exception("Не знайдено налаштування для теплиці");
+
+
+            var result = new Dictionary<string, SensorGraphDto>
+            {
+                ["airTemp"] = new SensorGraphDto
+                {
+                    Values = sensorData.Select(d => (float?)d.AirTemp).ToList(),
+                    Min = settings.AirTempMin,
+                    Max = settings.AirTempMax
+                },
+                ["airHum"] = new SensorGraphDto
+                {
+                    Values = sensorData.Select(d => (float?)d.AirHum).ToList(),
+                    Min = settings.AirHumidityMin,
+                    Max = settings.AirHumidityMax
+                },
+                ["soilTemp"] = new SensorGraphDto
+                {
+                    Values = sensorData.Select(d => (float?)d.SoilTemp).ToList(),
+                    Min = settings.SoilTempMin,
+                    Max = settings.SoilTempMax
+                },
+                ["soilHum"] = new SensorGraphDto
+                {
+                    Values = sensorData.Select(d => (float?)d.SoilHum).ToList(),
+                    Min = settings.SoilHumidityMin,
+                    Max = settings.SoilHumidityMax
+                },
+                ["light"] = new SensorGraphDto
+                {
+                    Values = sensorData.Select(d => (float?)d.LightLevel).ToList(),
+                    Min = settings.LightMin,
+                    Max = settings.LightMax
+                }
+            };
+
+            return result;
+        }
+
+
 
 
 

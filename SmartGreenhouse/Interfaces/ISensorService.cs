@@ -6,5 +6,6 @@ namespace SmartGreenhouse.Interfaces
     {
         GreenhouseStatusDto AddSensorReading(SensorReadingCreateDto dto);
         SensorReadDto ReadSensorDataById(int ghId);
+        Task<Dictionary<string, SensorGraphDto>> GetAllChartDataAsync(int greenhouseId);
     }
 }
